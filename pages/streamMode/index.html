@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>FGAR镜头</title>
+</head>
+<link rel="stylesheet" href="../../css/Bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="components.css">
+
+<body>
+<div class="myvue" id="app">
+	<div class="loader_container" ref="loader">
+		<div class="loader">
+			<div class="cell d-0"></div>
+			<div class="cell d-1"></div>
+			<div class="cell d-2"></div>
+			<div class="cell d-1"></div>
+			<div class="cell d-2"></div>
+			<div class="cell d-2"></div>
+			<div class="cell d-3"></div>
+			<div class="cell d-3"></div>
+			<div class="cell d-4"></div>
+		</div>
+		<div class="loaderText">
+			{{loaderText}}
+		</div>
+		
+	</div>
+	<div class="header">
+		<div class="left">
+			<img src="../../imgs/logo.png" alt="logo.png" width="180px" height="50px">
+			<div class="recognizeMode" @click="onStreamModeClick">流式识别</div>
+			<div class="recognizeMode selectedMode" @click="onUploadModeClick">上传识别</div>
+		</div>
+		<div class="middle">
+			<h3>FGAR云镜</h3>
+		</div>
+		<div class="right">
+			<div>说明</div>
+			<div>登录</div>
+		</div>
+	</div>
+	<div class="main_body">
+		<div class="video_container">
+			<!-- 腾讯云直播sdk -->
+			<div id="local_video" style="width:100%;height:500px;display:flex;align-items:center;justify-content:center;border:2px solid red;"></div>
+			<!-- <div><b></b><span>{{selectedFileName}}</span></div> -->
+			<div class="control_btns">
+				<button v-if="uploadStatus==0" class="control_btn" @click="onUploadBtnClick"><span>开始识别</span></button>
+				<button v-if="uploadStatus==1" class="control_btn" ><span> 正在识别</span></button>
+				<button v-if="uploadStatus==2" class="control_btn" @click="onDownloadButtonClick"><span>识别完成，点击下载</span></button>
+			</div>
+		</div>
+
+		<div class="option_btns">
+			<div class="option_btn">
+				<div>使用前置摄像头:</div>
+				<label class="switch">
+					<input type="checkbox" v-model="useFrontCamera">
+					<span class="slider"></span>
+				</label>
+			</div>
+			<div class="option_btn">
+				<div>高分辨率:</div>
+				<label class="switch">
+					<input type="checkbox" v-model="useHighQuality">
+					<span class="slider"></span>
+				</label>
+			</div>
+			<div class="option_btn">
+				<div>选择模型:</div>
+				<select v-model="selectedModel" class="selectModelBtn">
+					<option v-for="option in modelOptions" v-bind:value="option.value">
+						{{ option.text }}
+					</option>
+				</select>
+			</div>
+		</div>
+	</div>
+	<div class="footer">
+		<div class="left">
+			<div>由 Ozymandias 开发</div>
+			<div>禁止盗刷接口</div>
+		</div>
+		<div class="footer_line"></div>
+		<div class="middle">
+			<h3>使用说明</h3>
+			<div>首先登录，获取临时授权码</div>
+			<div>获取后填入，有效期 10 分钟</div>
+		</div>
+		<div class="footer_line"></div>
+		<div class="right">
+			<div>GitHub:</div>
+			<div>邮箱:</div>
+		</div>
+	</div>
+	<div class="margin_box"></div>
+</div>
+
+	
+</div>
+	<script src="../../js/dependencies/vue.min.js"></script>
+	<script src="../../js/dependencies/jquery.min.js"></script>
+	<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script> -->
+	<script src="../../js/dependencies/bootstrap.min.js"></script>
+	<!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+	<script src="../../js/dependencies/axios.min.js"></script>
+	<script src="https://video.sdk.qcloudecdn.com/web/TXLivePusher-2.1.0.min.js" charset="utf-8"></script>
+	<script src="index.js"></script>
+	
+</body>
+
+</html>
