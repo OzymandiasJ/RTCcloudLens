@@ -3,6 +3,7 @@
 new Vue({
     el: '#app',
     data: {
+        httpsdomain:"https://fgar.mynatapp.cc",
         hasStarted: false,
         pc: new RTCPeerConnection(),
         localStream: null,
@@ -78,7 +79,7 @@ new Vue({
                 await this.pc.setLocalDescription(offer);
         
                 // 通过服务器发送 offer 并接收 answer
-                const response = await fetch("https://fgar.mynatapp.cc/api/offer", {
+                const response = await fetch(this.httpsdomain+"/api/offer", {
                     method: "POST",
                     body: JSON.stringify({
                         sdp: this.pc.localDescription.sdp,
