@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebRTC with YOLO Processing</title>
+    <script src="vue.min.js"></script>
+</head>
+<style>
+    .videoDiv {
+        border: 1px solid red;
+        width: 700px;
+    }
+    .commonMsgDiv {
+        border: 1px solid blue; /* 改为蓝色边框以便更容易区分 */
+        padding: 10px;  /* 添加一些内边距 */
+        margin-top: 20px; /* 与上方内容保持一些间隔 */
+        font-size: 20px; /* 增加字体大小，确保在移动设备上易于阅读 */
+    }
+</style> 
+<body> 
+    <div id="app">
+        <h1>Video Stream with YOLO Processing</h1>
+        <div>
+            <video id="video" class="videoDiv" playsinline autoplay></video>
+        </div>
+        <button v-if="!hasStarted" @click="startCamera">{{ '开始识别' }}</button>
+        <button v-if="hasStarted" @click="finishCamera">结束识别并放弃下载</button>
+        <button v-if="hasStarted" @click="finishCamera_download">结束识别并开始下载</button>
+        <div class="commonMsgDiv">{{commonMsg}}</div>
+    </div>
+    
+
+</body> 
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            hasStarted: false,
+            pc: new RTCPeerConnection(),
+            localStream: null,
+            mediaRecorder: null,
+            recordedBlobs: [],
+            commonMsg:"请点击开始识别,请授予摄像头权限",
+        },
+        methods: {
+            async startCamera() {
+                this.commonMsg="初始化资源，建立连接中..."
+                console.log("初始化资源，建立连接中");
+                try {
+                    // 尝试获取后置摄像头
+                    this.localStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'environment' }
+                    });
+                } catch (error) {
+                    // 如果无法获取后置摄像头，回退到默认设置
+                    console.error("后置摄像头获取失败，尝试默认摄像头: ", error);
+                    this.localStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                }
+                if(this.localStream==null){
+                    this.commonMsg="ERROR:无法获取摄像头"
+                }
+                this.localStream.getTracks().forEach(track => this.pc.addTrack(track, this.localStream));
+                this.displayVideo();
+                // 创建并发送 SDP offer
+                const offer = await this.pc.createOffer();
+                await this.pc.setLocalDescription(offer);
+                
+                // 通过服务器发送 offer 并接收 answer
+                const response = await fetch("https://fgar.mynatapp.cc/api/offer", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        sdp: this.pc.localDescription.sdp,
+                        type: this.pc.localDescription.type //offer类型
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                this.commonMsg="连接已建立，识别中"
+                console.log("连接已建立，识别中...");
+                const answer = await response.json();
+                await this.pc.setRemoteDescription(new RTCSessionDescription(answer));
+                this.hasStarted = true;
+            },
+
+            finishCamera(){
+                console.log("结束识别——不保存");
+
+                this.cleanupResources();
+                this.commonMsg="点击开始进行新一轮识别"
+            },
+
+            async finishCamera_download() {
+                console.log("结束识别——并保存");
+                if (this.mediaRecorder.state === 'recording') {
+                    this.mediaRecorder.stop();
+                }else{
+                    alert("ERROR:录制未开始");
+                }
+                this.commonMsg="保存中，请稍等"
+                await this.saveVideo();
+                this.cleanupResources();
+                this.commonMsg="保存完成已下载，感谢使用"
+            },
+
+            displayVideo(){
+                // 设置RTCPeerConnection的ontrack事件处理器
+                this.pc.ontrack = (event) => {
+                    if (!this.remoteStream) {
+                        this.remoteStream = new MediaStream();
+                    }
+                    
+                    // 将接收到的轨道添加到remoteStream中
+                    event.streams[0].getTracks().forEach(track => {
+                        this.remoteStream.addTrack(track);
+                    });
+
+                    // 显示远程视频流
+                    document.getElementById('video').srcObject = this.remoteStream;
+
+                    // 初始化MediaRecorder来录制远程流
+                    if (!this.mediaRecorder || this.mediaRecorder.state === 'inactive') {
+                        this.setupMediaRecorder();
+                    }
+                };
+            },
+
+            setupMediaRecorder() {
+                if (this.remoteStream) {
+                    this.recordedBlobs = [];
+                    
+                    // 确保使用此远程流初始化MediaRecorder
+                    this.mediaRecorder = new MediaRecorder(this.remoteStream, { mimeType: 'video/webm' });
+
+                    // 开始录制
+                    this.mediaRecorder.start(10);
+
+                    // 当有数据可用时，将其添加到recordedBlobs数组中
+                    this.mediaRecorder.ondataavailable = event => {
+                        if (event.data && event.data.size > 0) {
+                            this.recordedBlobs.push(event.data);
+                        }
+                    };
+
+                    // 可以添加更多的事件监听器，如录制停止时的处理
+                    this.mediaRecorder.onstop = () => {
+                        // 可以在这里处理录制完成后的逻辑，如下载视频文件
+                        console.log("Recording stopped.");
+                    };
+                } else {
+                    console.error("No remote stream available to record.");
+                }
+            },
+
+            async saveVideo() {
+                const blob = new Blob(this.recordedBlobs, { type: 'video/webm' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'recorded_video.webm';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            },
+
+            cleanupResources() {
+                if (this.localStream) {
+                    this.localStream.getTracks().forEach(track => track.stop());
+                }
+                this.localStream = null;
+                this.pc.close();
+                this.pc = new RTCPeerConnection();
+                this.hasStarted = false;
+                document.getElementById('video').srcObject = null;
+            },
+        }
+    });
+</script>
+
+</html>

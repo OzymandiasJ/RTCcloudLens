@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>FGAR镜头</title>
+</head>
+<link rel="stylesheet" href="../../css/Bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="components.css">
+
+<body>
+<div class="myvue" id="app">
+	<div class="loader_container" ref="loader">
+		<div class="loader">
+			<div class="cell d-0"></div>
+			<div class="cell d-1"></div>
+			<div class="cell d-2"></div>
+			<div class="cell d-1"></div>
+			<div class="cell d-2"></div>
+			<div class="cell d-2"></div>
+			<div class="cell d-3"></div>
+			<div class="cell d-3"></div>
+			<div class="cell d-4"></div>
+		</div>
+		<div class="loaderText">
+			{{loaderText}}
+		</div>
+	</div>
+	<div class="header">
+		<div class="left">
+			<img src="../../imgs/logo.png" @click="onLogoClick" alt="logo.png" width="180px" height="50px">
+			<div class="recognizeMode" @click="onStreamModeClick">流式识别</div>
+			<div class="recognizeMode selectedMode" @click="onFileStreamModeClick">流式文件</div>
+			<div class="recognizeMode " @click="onUploadModeClick">上传识别</div>
+		</div>
+		<div class="middle">
+			<span>FGAR云镜</span>
+		</div>
+		<div class="right">
+			<div>说明</div>
+			<div>登录</div>
+		</div>
+	</div>
+	<div class="main_body">
+		<div style="text-align: center;margin-bottom: 10px;margin-top: 30px;"><h3>RTC文件流式识别</h3></div>
+		<div class="modeDescription">
+			选择视频文件，在线实时预览处理过程
+		</div>
+		<div class="video_container">
+			<div class="videoDiv">
+				<video id="processed_video" class="processed_video" playsinline autoplay></video>
+			</div>
+			
+			<form class="file-upload-form">
+				<label for="file" class="file-upload-label">
+					<div class="file-upload-design">
+						<svg viewBox="0 0 640 512" height="1em">
+							<path
+								d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39V392c0 13.3 10.7 24 24 24s24-10.7 24-24V257.9l39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z">
+							</path>
+						</svg>
+						<p v-if="selectedFile!=null"><b>已选择的文件：</b></p>
+						<p>{{selectedFileName}}</p>
+						<span class="browse-button">选择文件</span>
+					</div>
+					<input id="file" type="file"  @change="onFileSelected" />
+				</label>
+			</form>
+		</div>
+
+			
+		<div class="commonMsgDiv">{{commonMsg}}</div>
+		<div class="control_btns">
+			<button class="control_btn" v-if="!hasStarted" @click="startStream"><span>{{ '点击开始识别' }}</span></button>
+			<button class="control_btn" v-if="hasStarted" @click="finishStream_download"><span>结束识别并保存视频</span></button>
+			<button class="control_btn" v-if="hasStarted" @click="finishStream"><span>结束识别并放弃保存</span></button>
+			<!-- <button class="control_btn" ><span> 正在识别</span></button> -->
+		</div>
+		
+
+		<div class="option_btns">
+			<!-- <div class="option_btn">
+				<div>使用前置摄像头:</div>
+				<label class="switch">
+					<input type="checkbox" v-model="useFrontCamera">
+					<span class="slider"></span>
+				</label>
+			</div> -->
+			<div class="option_btn">
+				<div>高分辨率:</div>
+				<label class="switch">
+					<input type="checkbox" v-model="useHighQuality">
+					<span class="slider"></span>
+				</label>
+			</div>
+			<div class="option_btn">
+				<div>选择模型:</div>
+				<select v-model="selectedModel" class="selectModelBtn">
+					<option v-for="option in modelOptions" v-bind:value="option.value">
+						{{ option.text }}
+					</option>
+				</select>
+			</div>
+		</div>
+	</div>
+	<div class="footer">
+		<div class="left">
+			<div>由 Ozymandias 开发</div>
+			<div>禁止盗刷接口</div>
+		</div>
+		<div class="footer_line"></div>
+		<div class="middle">
+			<h3>使用说明</h3>
+			<div>首先登录，获取临时授权码</div>
+			<div>获取后填入，有效期 10 分钟</div>
+		</div>
+		<div class="footer_line"></div>
+		<div class="right">
+			<div>GitHub:</div>
+			<div>邮箱:ozymandiasxj@gmail.com</div>
+		</div>
+	</div>
+	<div class="margin_box"></div>
+</div>
+
+	
+</div>
+	<script src="../../js/dependencies/vue.min.js"></script>
+	<script src="../../js/dependencies/jquery.min.js"></script>
+	<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script> -->
+	<script src="../../js/dependencies/bootstrap.min.js"></script>
+	<!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+	<script src="../../js/dependencies/axios.min.js"></script>
+	<script src="https://video.sdk.qcloudecdn.com/web/TXLivePusher-2.1.0.min.js" charset="utf-8"></script>
+	<script src="index.js?v=1.1"></script>
+	<script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
+	<script>
+		// VConsole 会自动挂载到 `window.VConsole`
+		var vConsole = new window.VConsole();
+	</script>
+</body>
+
+</html>

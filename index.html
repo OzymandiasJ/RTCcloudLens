@@ -17,7 +17,7 @@
 
 		</div>
 		<div class="middle">
-			<h3>FGFAR云镜</h3>
+			<h3>FGAR云镜</h3>
 		</div>
 		<div class="right">
 			<div>说明</div>
@@ -31,6 +31,8 @@
 			<div>一个基于 YOLOV8 的细粒度融合行为识别算法</div>
 			<div>上传识别模式</div>
 			<div>选择你的文件(视频支持 MP4,AVI,m4v,mkv,gif等格式，图像支持jpg,png等主流格式)，上传等待在线识别完成，点击下载即可</div>
+			<div>文件流式识别模式</div>
+			<div>实时识别图像或视频文件,可实时预览识别效果</div>
 			<div>流式识别模式</div>
 			<div>建议使用移动设备，调用摄像头进行实时识别(即将上线)</div>
 		</div>
@@ -46,7 +48,7 @@
 			</div>
 			<div class="useModes">
 				<div class="streamMode">
-					<button @click="onStreamModeClick">
+					<button class="modeBtns" @click="onStreamModeClick">
 						<span class="text">流式识别模式</span>
 						<span class="blob"></span>
 						<span class="blob"></span>
@@ -54,8 +56,17 @@
 						<span class="blob"></span>
 					</button>
 				</div>
+				<div class="fileStreamMode">
+					<button  class="modeBtns" @click="onFileStreamModeClick">
+						<span class="text">文件流式识别模式</span>
+						<span class="blob"></span>
+						<span class="blob"></span>
+						<span class="blob"></span>
+						<span class="blob"></span>
+					</button>
+				</div>
 				<div class="uploadMode">
-					<button @click="onUploadModeClick">
+					<button  class="modeBtns" @click="onUploadModeClick">
 						<span class="text">上传识别模式</span>
 						<span class="blob"></span>
 						<span class="blob"></span>
@@ -86,8 +97,6 @@
 	</div>
 	<div class="margin_box"></div>
 </div>
-
-	
 </div>
 	<script src="js/dependencies/vue.min.js"></script>
 	<script src="js/dependencies/jquery.min.js"></script>
