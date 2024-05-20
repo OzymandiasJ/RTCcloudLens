@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebRTC with YOLO Processing</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@latest"></script>
+
+</head>
+<body>
+    <div id="app">
+        <h1>Video Stream with YOLO Processing</h1>
+        <div>
+            <video id="video" playsinline autoplay style="border: 1px solid red ;width:700px;"></video>
+        </div>
+        <button v-if="!hasStarted" @click="startCamera">{{ '开始识别' }}</button>
+        <button v-if="hasStarted" @click="finishCamera">结束识别并放弃下载</button>
+        <button v-if="hasStarted" @click="finishCamera_download">结束识别并开始下载</button>
+    </div>
+    
+
+</body> 
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            hasStarted: false,
+            pc: new RTCPeerConnection(),
+            localStream: null,
+            mediaRecorder: null,
+            recordedBlobs: []
+        },
+        methods: {
+            async startCamera() {
+                console.log("初始化资源，建立连接中");
+                this.displayVideo();
+                this.localStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                this.localStream.getTracks().forEach(track => this.pc.addTrack(track, this.localStream));
+
+                this.mediaRecorder = new MediaRecorder(this.localStream, { mimeType: 'video/webm' });
+                this.recordedBlobs = [];
+                this.mediaRecorder.ondataavailable = event => {
+                    if (event.data && event.data.size > 0) {
+                        this.recordedBlobs.push(event.data);
+                    }
+                };
+                this.mediaRecorder.start(10);
+                // 创建并发送 SDP offer
+                const offer = await this.pc.createOffer();
+                await this.pc.setLocalDescription(offer);
+                // 通过服务器发送 offer 并接收 answer
+                const response = await fetch("https://fgar.mynatapp.cc/offer", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        sdp: this.pc.localDescription.sdp,
+                        type: this.pc.localDescription.type
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const answer = await response.json();
+                await this.pc.setRemoteDescription(new RTCSessionDescription(answer));
+                this.hasStarted = true;
+            },
+
+            finishCamera(){
+                console.log("结束识别——不保存");
+                this.cleanupResources();
+            },
+
+            async finishCamera_download() {
+                console.log("结束识别——并保存");
+                if (this.mediaRecorder.state === 'recording') {
+                    this.mediaRecorder.stop();
+                }
+                await this.saveVideo();
+                this.cleanupResources();
+            },
+
+            displayVideo(){
+                this.pc.ontrack = (event) => {
+                    document.getElementById('video').srcObject = event.streams[0];
+                };
+            },
+
+            async saveVideo() {
+                const blob = new Blob(this.recordedBlobs, { type: 'video/webm' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'recorded_video.webm';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            },
+
+            cleanupResources() {
+                if (this.localStream) {
+                    this.localStream.getTracks().forEach(track => track.stop());
+                }
+                this.localStream = null;
+                this.pc.close();
+                this.pc = new RTCPeerConnection();
+                this.hasStarted = false;
+                document.getElementById('video').srcObject = null;
+            },
+        }
+    });
+</script>
+
+</html>

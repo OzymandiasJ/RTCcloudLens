@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>FGAR镜头</title>
+</head>
+<link rel="stylesheet" href="../../css/Bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="index.css?v=1.1">
+<link rel="stylesheet" href="components.css">
+
+<body>
+<div class="myvue" id="app">
+	<div class="loader_container" ref="loader">
+		<div class="loader">
+			<div class="cell d-0"></div>
+			<div class="cell d-1"></div>
+			<div class="cell d-2"></div>
+			<div class="cell d-1"></div>
+			<div class="cell d-2"></div>
+			<div class="cell d-2"></div>
+			<div class="cell d-3"></div>
+			<div class="cell d-3"></div>
+			<div class="cell d-4"></div>
+		</div>
+		<div class="loaderText">
+			{{loaderText}}
+		</div>
+	</div>
+	
+	<div>
+		<div class="header">
+			<div class="left">
+				<img src="../../imgs/logo.png" @click="onLogoClick" alt="logo.png" width="180px" height="50px">
+				<div class="recognizeMode selectedMode" @click="onStreamModeClick">流式识别</div>
+				<div class="recognizeMode " @click="onFileStreamModeClick">流式文件</div>
+				<div class="recognizeMode " @click="onUploadModeClick">上传识别</div>
+			</div>
+			<div class="middle">
+				<span>FGAR云镜</span>
+			</div>
+			<div class="right">
+				<div>说明</div>
+				<div class="right2">登录</div>
+			</div>
+		</div>
+		<div class="main_body">
+			<div style="text-align: center;margin-bottom: 10px;margin-top: 30px;"><h3>WebRTC流式识别</h3></div>
+			<div class="modeDescription">
+				移动端默认使用后置摄像头，开始识别后可选择停止后保存视频，请确保本地空间足够存放视频文件，默认保存视频格式为webm格式
+			</div>
+			<div class="video_container">
+				<video id="video" class="videoDiv"  autoplay muted playsinline></video>
+				<div v-if="!hasStarted" class="textBtn" style="text-align: center;">{{textBtn_text}}</div>
+			</div>
+				
+			<div class="commonMsgDiv">{{commonMsg}}</div>
+			<div class="control_btns">
+				<button class="control_btn" v-if="!hasStarted" @click="startCamera"><span>{{ '点击开始识别' }}</span></button>
+				<button class="control_btn" v-if="hasStarted" @click="finishCamera_download"><span>结束识别并保存视频</span></button>
+				<button class="control_btn" v-if="hasStarted" @click="finishCamera"><span>结束识别并放弃保存</span></button>
+				<!-- <button class="control_btn" ><span> 正在识别</span></button> -->
+			</div>
+			
+	
+			<div class="option_btns">
+				<!-- <div class="option_btn">
+					<div>使用前置摄像头:</div>
+					<label class="switch">
+						<input type="checkbox" v-model="useFrontCamera">
+						<span class="slider"></span>
+					</label>
+				</div> -->
+				<div class="option_btn">
+					<div>选择摄像头:</div>
+					<select v-model="selectedCamera" @click="onselectCameraClick" class="selectModelBtn">
+						<option v-for="(deviceId, label) in cameraOptions" v-bind:value="label">
+							{{ label }}
+						</option>
+					</select>
+				</div>
+				<div class="option_btn">
+					<div>选择模型:</div>
+					<select v-model="selectedModel" class="selectModelBtn">
+						<option v-for="option in modelOptions" v-bind:value="option.value">
+							{{ option.text }}
+						</option>
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="footer">
+		<div class="left">
+			<div>由 Ozymandias 开发</div>
+			<div>禁止盗刷接口</div>
+		</div>
+		<div class="footer_line"></div>
+		<div class="middle">
+			<h3>使用说明</h3>
+			<div>首先登录，获取临时授权码</div>
+			<div>获取后填入，有效期 10 分钟</div>
+		</div>
+		<div class="footer_line"></div>
+		<div class="right">
+			<div>GitHub:</div>
+			<div>邮箱:ozymandiasxj@gmail.com</div>
+		</div>
+	</div>
+	<!-- <div class="margin_box"></div> -->
+</div>
+
+	
+</div>
+	<script src="../../js/dependencies/vue.min.js"></script>
+	<script src="../../js/dependencies/jquery.min.js"></script>
+	<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script> -->
+	<script src="../../js/dependencies/bootstrap.min.js"></script>
+	<!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+	<script src="../../js/dependencies/axios.min.js"></script>
+	<script src="../../js/dependencies/adapter.js"></script>
+	<script src="https://video.sdk.qcloudecdn.com/web/TXLivePusher-2.1.0.min.js" charset="utf-8"></script>
+	<script src="index.js?v=1.1"></script>
+	<script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
+	<script>
+		// VConsole 会自动挂载到 `window.VConsole`
+		var vConsole = new window.VConsole();
+	</script>
+</body>
+
+</html>

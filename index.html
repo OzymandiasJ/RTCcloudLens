@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>FGAR镜头</title>
+</head>
+<link rel="stylesheet" href="css/Bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="css/index.css?v=1.0">
+<link rel="stylesheet" href="css/components.css">
+
+<body>
+<div class="myvue" id="app">
+	<div>
+		<div class="header">
+			<div class="left">
+				<img src="imgs/logo.png" alt="logo.png" width="180px" height="50px">
+	
+			</div>
+			<div class="middle">
+				<h3>FGAR云镜</h3>
+			</div>
+			<div class="right">
+				<div>说明</div>
+				<div class="right2">登录</div>
+			</div>
+		</div>
+		<div class="main_body">
+			<h3 class="main_body_head">FGAR算法在线调用平台</h3>
+			<div class="main_body_desc">
+				<div>FGAR算法介绍</div>
+				<div>一个基于 YOLOV8 的细粒度融合行为识别算法</div>
+				<div>上传识别模式</div>
+				<div>选择你的文件(视频支持 MP4,AVI,m4v,mkv,gif等格式，图像支持jpg,png等主流格式)，上传等待在线识别完成，点击下载即可</div>
+				<div>文件流式识别模式</div>
+				<div>实时识别图像或视频文件,可实时预览识别效果</div>
+				<div>流式识别模式</div>
+				<div>建议使用移动设备，调用摄像头进行实时识别(即将上线)</div>
+			</div>
+			<div class="main_body_startUse">
+				<div>开始使用，选择模式</div>
+				<div>
+					<svg t="1709453030601" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4226"
+						width="32" height="32">
+						<path
+							d="M183.168 332.501333a42.666667 42.666667 0 0 1 57.621333-2.496l2.709334 2.496L512 600.96l268.501333-268.48a42.666667 42.666667 0 0 1 57.621334-2.496l2.709333 2.496a42.666667 42.666667 0 0 1 2.496 57.621333l-2.496 2.709334-298.666667 298.666666a42.666667 42.666667 0 0 1-57.621333 2.496l-2.709333-2.496-298.666667-298.666666a42.666667 42.666667 0 0 1 0-60.330667z"
+							fill="#ffffff" p-id="4227" data-spm-anchor-id="a313x.search_index.0.i0.23233a813KcVC0" class="selected"></path>
+					</svg>
+				</div>
+				<div class="useModes">
+					<div class="streamMode">
+						<button class="modeBtns" @click="onStreamModeClick">
+							<span class="text">流式识别模式</span>
+							<span class="blob"></span>
+							<span class="blob"></span>
+							<span class="blob"></span>
+							<span class="blob"></span>
+						</button>
+					</div>
+					<div class="fileStreamMode">
+						<button  class="modeBtns" @click="onFileStreamModeClick">
+							<span class="text">文件流式识别模式</span>
+							<span class="blob"></span>
+							<span class="blob"></span>
+							<span class="blob"></span>
+							<span class="blob"></span>
+						</button>
+					</div>
+					<div class="uploadMode">
+						<button  class="modeBtns" @click="onUploadModeClick">
+							<span class="text">上传识别模式</span>
+							<span class="blob"></span>
+							<span class="blob"></span>
+							<span class="blob"></span>
+							<span class="blob"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="footer">
+		<div class="left">
+			<div>由 Ozymandias 开发</div>
+			<div>禁止盗刷接口</div>
+		</div>
+		<div class="footer_line"></div>
+		<div class="middle">
+			<h3>使用说明</h3>
+			<div>首先登录，获取临时授权码</div>
+			<div>获取后填入，有效期 10 分钟</div>
+		</div>
+		<div class="footer_line"></div>
+		<div class="right">
+			<div>GitHub:</div>
+			<div>邮箱:</div>
+		</div>
+	</div>
+	<!-- <div class="margin_box"></div> -->
+</div>
+</div>
+	<script src="js/dependencies/vue.min.js"></script>
+	<script src="js/dependencies/jquery.min.js"></script>
+	<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script> -->
+	<script src="js/dependencies/bootstrap.min.js"></script>
+	<!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+	<script src="js/dependencies/axios.min.js"></script>
+	<script src="js/index.js"></script>
+</body>
+
+</html>
